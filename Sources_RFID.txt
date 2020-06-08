@@ -1,0 +1,11 @@
+20_06_08
+
+réalisation serveur Pi : https://bentek.fr/pirobot-partie-3-realisation-dun-serveur-udp-sur-notre-raspberry/
+
+https://boichat.developpez.com/tutoriel/communication-arduino-raspberry-pi/
+
+https://www.raspberrypi.org/forums/viewtopic.php?t=195395
+
+
+
+
