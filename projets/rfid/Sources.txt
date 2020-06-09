@@ -9,3 +9,5 @@ https://www.raspberrypi.org/forums/viewtopic.php?t=195395
  20_06_09
 
 https://www.binarytides.com/socket-programming-c-linux-tutorial/
+
+https://www.raspberrypi.org/forums/viewtopic.php?t=244415
