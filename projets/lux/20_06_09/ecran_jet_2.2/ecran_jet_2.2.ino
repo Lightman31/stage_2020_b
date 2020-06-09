@@ -24,9 +24,9 @@
 //#define rst  8  // you can also connect this to the Arduino reset
 
 //Use these pins for the shield!
-#define sclk 13
-#define mosi 11
-#define cs   10
+#define sclk 52
+#define mosi 51
+#define cs   53
 #define dc   8
 #define rst  5  // you can also connect this to the Arduino reset
 
@@ -40,13 +40,13 @@
 #endif
 
 // Option 1: use any pins but a little slower
-Adafruit_ST7735 tft = Adafruit_ST7735(cs, dc, mosi, sclk, rst);
+//Adafruit_ST7735 tft = Adafruit_ST7735(cs, dc, mosi, sclk, rst);
 // Option 2: must use the hardware SPI pins
 // (for UNO thats sclk = 13 and sid = 11) and pin 10 must be
 // an output. This is much faster - also required if you want
 // to use the microSD card (see the image drawing example)
-//Adafruit_ST7735 tft = Adafruit_ST7735(cs, dc, rst);
-float p = 3.1415926;
+Adafruit_ST7735 tft = Adafruit_ST7735(cs, dc, rst);
+
 
 #define Neutral 0
 #define Press 1
@@ -69,11 +69,16 @@ const int button_mooveLeft = 24;
 const int button_save1 = 26;
 const int button_save2 = 28;
 const int button_save3 = 30;
-const int button_save4 = 32;
-const int button_save5 = 34;
+//const int button_save4 = 32;
+//const int button_save5 = 34;
+const int button_mesure_lancement = 32;
+const int button_mesure_pt_suivant = 34;
 // variables will change:
 int buttonState = 0;         // variable for reading the pushbutton status
-int pos = 0 ;
+float pos = 0 ;
+
+float savedVal[5];
+bool pointused[5] = {false};
 char* text;
 
 
@@ -83,69 +88,58 @@ void setup(void) {
    pinMode(button_save1, INPUT);
    pinMode(button_save2, INPUT);
    pinMode(button_save3, INPUT);
-   pinMode(button_save4, INPUT);
-   pinMode(button_save5, INPUT);
-  // Our supplier changed the 1.8" display slightly after Jan 10, 2012
-  // so that the alignment of the TFT had to be shifted by a few pixels
-  // this just means the init code is slightly different. Check the
-  // color of the tab to see which init code to try. If the display is
-  // cut off or has extra 'random' pixels on the top & left, try the
-  // other option!
-  // If you are seeing red and green color inversion, use Black Tab
-  // If your TFT's plastic wrap has a Black Tab, use the following:
-  tft.initR(INITR_BLACKTAB);   // initialize a ST7735S chip, black tab
-  // If your TFT's plastic wrap has a Red Tab, use the following:
-  //tft.initR(INITR_REDTAB);   // initialize a ST7735R chip, red tab
-  // If your TFT's plastic wrap has a Green Tab, use the following:
-  //tft.initR(INITR_GREENTAB); // initialize a ST7735R chip, green tab
-  tft.setCursor(0, 30);
-  tft.fillScreen(ST7735_BLACK);
-  tft.setCursor(0, 30);
-  //tft.setTextColor(ST7735_GREEN);
-  //delay(1000);
+   pinMode(button_mesure_lancement, INPUT);
+   pinMode(button_mesure_pt_suivant, INPUT);
+   
+  tft.initR(INITR_BLACKTAB);
 
-  //tftPrintTest();
-  clearscreen();
+  initialaff();
 
 }
 
 void loop() {
 
-itoa (pos, text, 10);
-  testdrawtext(text, NOIR, 0,10, 2);
+
   
+  // boutons de déplacement du chariot
   buttonState = digitalRead(button_mooveRight);
   if (buttonState == HIGH) {
-    pos = pos -1;
+    hideCurrentPos();
+    pos = pos -0.01;
+    affCurrentPos();
   } 
 
   buttonState = digitalRead(button_mooveLeft);
   if (buttonState == HIGH) {
-    pos = pos + 1;
+    hideCurrentPos();
+    pos = pos + 0.01;
+    affCurrentPos();
   } 
-itoa (pos, text, 10);
-  testdrawtext(pos, BLANC, 0,10, 2);
-
+  
+  // boutons de choix de positions
   buttonState = digitalRead(button_save1);
   if (buttonState == HIGH) {
-    testdrawtext("1", VERT, 0,50, 1);
-  } else {
-    testdrawtext("1", ROUGE, 0,50, 1);
-  }
+    positionchoosed(0);
+  } 
 
   buttonState = digitalRead(button_save2);
   if (buttonState == HIGH) {
-    testdrawtext("2", VERT, 0,60, 1);
-  } else {
-    testdrawtext("2", ROUGE, 0,60, 1);
-  }
+    positionchoosed(1);
+  } 
 
   buttonState = digitalRead(button_save3);
   if (buttonState == HIGH) {
-    testdrawtext("3", VERT, 0,70, 1);
-  } else {
-    testdrawtext("3", ROUGE, 0,70, 1);
-  }
+    positionchoosed(2);
+  } 
+
+  buttonState = digitalRead(button_mesure_lancement);
+  if (buttonState == HIGH) {
+    throwMesure();
+  } 
+  buttonState = digitalRead(button_mesure_pt_suivant);
+  if (buttonState == HIGH) {
+    positionchoosed(2);
+  } 
 
   
 
@@ -153,9 +147,38 @@ itoa (pos, text, 10);
 delay (200);
 }
 
+void throwMesure()
+{
+  int nextpoint = 0;
+  
+  buttonState = digitalRead(button_mesure_pt_suivant);
+  if (buttonState == HIGH) {
+    positionchoosed(2);
+  } 
+}
+
+
 void clearscreen()
 {
   tft.fillScreen(NOIR);
+}
+
+void positionchoosed(int number)
+{
+  tft.setTextColor(NOIR);
+  tft.setTextSize(1);
+  tft.setCursor(20, 50 + 10*number);
+  tft.print(savedVal[number]);
+  savedVal[number] = pos;
+  pointused[number] = true;
+  tft.setTextColor(VERT);
+  tft.setTextWrap(true);
+  tft.setCursor(0,50 + 10*number);
+  tft.print(number+1);
+  tft.setCursor(10, 50 + 10*number);
+  tft.print(":");
+  tft.setCursor(20, 50 + 10*number);
+  tft.print(savedVal[number]);
 }
 
 void testdrawtext(char *text, uint16_t color, int cursor_x, int cursor_y, int taille) {
@@ -165,6 +188,84 @@ void testdrawtext(char *text, uint16_t color, int cursor_x, int cursor_y, int ta
   tft.setTextSize(taille);
   tft.print(text);
 }
+
+void initialisationazero()
+{
+  while (pos >= 0)
+  {
+    Serial.println(pos);
+    pos = pos - 0.05;
+    delay(1);
+  }
+  Serial.println(pos);
+  delay (1500);
+  
+  pos = 2;
+  Serial.println(pos);
+  
+  while (pos >= 0)
+  {
+    Serial.println(pos);
+    pos = pos - 0.01;
+    delay(20);
+  }
+  Serial.println(pos);
+  delay (1500);
+  
+}
+
+void initialaff()
+{ 
+  tft.setCursor(0, 30);
+  clearscreen();
+  affCurrentPos();
+  testdrawtext("1", ROUGE, 0,50, 1);
+  testdrawtext("2", ROUGE, 0,60, 1);
+  testdrawtext("3", ROUGE, 0,70, 1);
+}
+
+
+void hideCurrentPos()
+{
+  tft.setTextWrap(true);
+  tft.setCursor(10, 10);
+  tft.setTextColor(NOIR);
+  tft.setTextSize(2);
+  tft.print(pos);
+}
+void affCurrentPos()
+{
+  tft.setTextWrap(true);
+  tft.setCursor(10, 10);
+  tft.setTextColor(BLANC);
+  tft.setTextSize(2);
+  tft.print(pos);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 void tftPrintTest() {
   tft.setTextWrap(false);
@@ -190,7 +291,6 @@ void tftPrintTest() {
   tft.println("Hello World!");
   tft.setTextSize(1);
   tft.setTextColor(ST7735_GREEN);
-  tft.print(p, 6);
   tft.println(" Want pi?");
   tft.println(" ");
   tft.print(8675309, HEX); // print 8,675,309 out in HEX!
