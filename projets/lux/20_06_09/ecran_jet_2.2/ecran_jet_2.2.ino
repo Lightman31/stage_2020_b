@@ -55,6 +55,8 @@ Adafruit_ST7735 tft = Adafruit_ST7735(cs, dc, rst);
 #define Right 4
 #define Left 5
 
+#define NBPOINT 5
+
 #define NOIR ST7735_BLACK 
 #define ROUGE ST7735_RED 
 #define JAUNE ST7735_YELLOW 
