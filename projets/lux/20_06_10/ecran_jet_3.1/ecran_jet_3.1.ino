@@ -41,14 +41,14 @@ Adafruit_ST7735 tft = Adafruit_ST7735(cs, dc, rst);
 #define Right 4
 #define Left 5
 
-#define NBPOINT 5
+#define NBPOINT 6
 
-#define NOIR ST7735_BLACK 
-#define ROUGE ST7735_RED 
-#define JAUNE ST7735_YELLOW 
-#define BLEU ST7735_BLUE 
-#define VERT ST7735_GREEN 
-#define BLANC ST7735_WHITE 
+#define NOIR ST7735_BLACK
+#define ROUGE ST7735_RED
+#define JAUNE ST7735_YELLOW
+#define BLEU ST7735_BLUE
+#define VERT ST7735_GREEN
+#define BLANC ST7735_WHITE
 
 Adafruit_Keypad customKeypad = Adafruit_Keypad( makeKeymap(keys), rowPins, colPins, ROWS, COLS);
 
@@ -58,19 +58,14 @@ Adafruit_Keypad customKeypad = Adafruit_Keypad( makeKeymap(keys), rowPins, colPi
 
 const int button_mooveRight = 22;
 const int button_mooveLeft = 24;
-const int button_save1 = 26;
-const int button_save2 = 28;
-const int button_save3 = 30;
-//const int button_save4 = 32;
-//const int button_save5 = 34;
 const int button_mesure_lancement = 32;
 const int button_mesure_pt_suivant = 34;
 // variables will change:
 int buttonState = 0;         // variable for reading the pushbutton status
 float pos = 0 ;
 
-float savedVal[5];
-bool pointused[5] = {false};
+float savedVal[NBPOINT];
+bool pointused[NBPOINT] = {false};
 char* text;
 
 int MusiquePin = 10;
@@ -80,35 +75,74 @@ int MusiquePin = 10;
 
 
 void setup() {
-  Serial.begin(9600);
-  customKeypad.begin();   
   
+  Serial.begin(9600);
+  customKeypad.begin();
+
   pinMode(button_mooveRight, INPUT);
   pinMode(button_mooveLeft, INPUT);
-  pinMode(button_save1, INPUT);
-  pinMode(button_save2, INPUT);
-  pinMode(button_save3, INPUT);
   pinMode(button_mesure_lancement, INPUT);
   pinMode(button_mesure_pt_suivant, INPUT);
-   
+
   tft.initR(INITR_BLACKTAB);
 
   initialaff();
 }
-/*
-  customKeypad.tick();
 
-  while(customKeypad.available()){
+void loop() {
+  customKeypad.tick();
+  while (customKeypad.available()) {
     keypadEvent e = customKeypad.read();
-    Serial.print((char)e.bit.KEY);
-    if(e.bit.EVENT == KEY_JUST_PRESSED) Serial.println(" pressed");
-    else if(e.bit.EVENT == KEY_JUST_RELEASED) Serial.println(" released");
+
+
+    if ((char)e.bit.KEY == '1' && e.bit.EVENT == KEY_JUST_RELEASED)
+    {
+      positionchoosed(0);
+    }
+    if ((char)e.bit.KEY == '2' && e.bit.EVENT == KEY_JUST_RELEASED)
+    {
+      positionchoosed(1);
+    }
+    if ((char)e.bit.KEY == '3' && e.bit.EVENT == KEY_JUST_RELEASED)
+    {
+      positionchoosed(2);
+    }
+    if ((char)e.bit.KEY == '4' && e.bit.EVENT == KEY_JUST_RELEASED)
+    {
+      positionchoosed(3);
+    }
+    if ((char)e.bit.KEY == '5' && e.bit.EVENT == KEY_JUST_RELEASED)
+    {
+      positionchoosed(4);
+    }
+    if ((char)e.bit.KEY == '6' && e.bit.EVENT == KEY_JUST_RELEASED)
+    {
+      positionchoosed(5);
+    }
+  }
+  // boutons de déplacement du chariot
+  buttonState = digitalRead(button_mooveRight);
+  if (buttonState == HIGH) {
+    hideCurrentPos();
+    pos = pos - 0.01;
+    affCurrentPos();
   }
 
-  delay(10);
-*/
-void loop() {
+  buttonState = digitalRead(button_mooveLeft);
+  if (buttonState == HIGH) {
+    hideCurrentPos();
+    pos = pos + 0.01;
+    affCurrentPos();
+  }
 
+
+
+  buttonState = digitalRead(button_mesure_lancement);
+  if (buttonState == HIGH) {
+    throwMesure();
+  }
+
+  delay (200);
 }
 
 
@@ -119,17 +153,17 @@ void throwMesure()
 {
   int nextpoint = 0;
   gotopoint(nextpoint);
-  while (nextpoint < NBPOINT-1)
+  while (nextpoint < NBPOINT - 1)
   {
-    
+
     buttonState = digitalRead(button_mesure_pt_suivant);
-    if (buttonState == HIGH) 
+    if (buttonState == HIGH)
     {
-      nextpoint = nextpoint+1;
+      nextpoint = nextpoint + 1;
       gotopoint(nextpoint);
-    } 
+    }
   }
-  
+
 
 }
 
@@ -138,22 +172,22 @@ void gotopoint(int point)
   float vect;
   if (pointused[point] == true)
   {
-    
+
     if (pos > savedVal[point])
     {
       vect = -0.01;
     }
-    else 
+    else
     {
       vect = -0.01;
     }
     hideCurrentPos();
     pos = savedVal[point];
-  
+
     affCurrentPos();
-    tone(MusiquePin, NOTE,50);
+    tone(MusiquePin, NOTE, 50);
     delay(200);
-    tone(MusiquePin, 450,50);
+    tone(MusiquePin, 450, 50);
     delay(200);
   }
 
@@ -170,17 +204,17 @@ void positionchoosed(int number)
 {
   tft.setTextColor(NOIR);
   tft.setTextSize(1);
-  tft.setCursor(20, 50 + 10*number);
+  tft.setCursor(20, 50 + 10 * number);
   tft.print(savedVal[number]);
   savedVal[number] = pos;
   pointused[number] = true;
   tft.setTextColor(VERT);
   tft.setTextWrap(true);
-  tft.setCursor(0,50 + 10*number);
-  tft.print(number+1);
-  tft.setCursor(10, 50 + 10*number);
+  tft.setCursor(0, 50 + 10 * number);
+  tft.print(number + 1);
+  tft.setCursor(10, 50 + 10 * number);
   tft.print(":");
-  tft.setCursor(20, 50 + 10*number);
+  tft.setCursor(20, 50 + 10 * number);
   tft.print(savedVal[number]);
 }
 
@@ -202,10 +236,10 @@ void initialisationazero()
   }
   Serial.println(pos);
   delay (1500);
-  
+
   pos = 2;
   Serial.println(pos);
-  
+
   while (pos >= 0)
   {
     Serial.println(pos);
@@ -214,17 +248,20 @@ void initialisationazero()
   }
   Serial.println(pos);
   delay (1500);
-  
+
 }
 
 void initialaff()
-{ 
+{
   tft.setCursor(0, 30);
   clearscreen();
   affCurrentPos();
-  testdrawtext("1", ROUGE, 0,50, 1);
-  testdrawtext("2", ROUGE, 0,60, 1);
-  testdrawtext("3", ROUGE, 0,70, 1);
+  testdrawtext("1", ROUGE, 0, 50, 1);
+  testdrawtext("2", ROUGE, 0, 60, 1);
+  testdrawtext("3", ROUGE, 0, 70, 1);
+  testdrawtext("4", ROUGE, 0, 80, 1);
+  testdrawtext("5", ROUGE, 0, 90, 1);
+  testdrawtext("6", ROUGE, 0, 100, 1);
 }
 
 
