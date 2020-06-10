@@ -1,27 +1,19 @@
-/***************************************************
-  This is an example sketch for the Adafruit 1.8" SPI display.
-  This library works with the Adafruit 1.8" TFT Breakout w/SD card
-  ----> http://www.adafruit.com/products/358
-  as well as Adafruit raw 1.8" TFT display
-  ----> http://www.adafruit.com/products/618
+#include "Adafruit_Keypad.h"
 
-  Check out the links above for our tutorials and wiring diagrams
-  These displays use SPI to communicate, 4 or 5 pins are required to
-  interface (RST is optional)
-  Adafruit invests time and resources providing this open source code,
-  please support Adafruit and open-source hardware by purchasing
-  products from Adafruit!
+#include <Adafruit_GFX.h>    // Core graphics library
+#include <Adafruit_ST7735.h> // Hardware-specific library
+#include <SPI.h>
 
-  Written by Limor Fried/Ladyada for Adafruit Industries.
-  MIT license, all text above must be included in any redistribution
- ****************************************************/
-
-// For the breakout, you can use any (4 or) 5 pins
-//#define sclk 4
-//#define mosi 5
-//#define cs   6
-//#define dc   7
-//#define rst  8  // you can also connect this to the Arduino reset
+#define KEYPAD_PID3844
+#define R1    42
+#define R2    43
+#define R3    44
+#define R4    45
+#define C1    36
+#define C2    37
+#define C3    38
+#define C4    39
+#include "keypad_config.h"
 
 //Use these pins for the shield!
 #define sclk 52
@@ -40,15 +32,7 @@
 #undef __FlashStringHelper::F(string_literal)
 #define F(string_literal) string_literal
 #endif
-
-// Option 1: use any pins but a little slower
-//Adafruit_ST7735 tft = Adafruit_ST7735(cs, dc, mosi, sclk, rst);
-// Option 2: must use the hardware SPI pins
-// (for UNO thats sclk = 13 and sid = 11) and pin 10 must be
-// an output. This is much faster - also required if you want
-// to use the microSD card (see the image drawing example)
 Adafruit_ST7735 tft = Adafruit_ST7735(cs, dc, rst);
-
 
 #define Neutral 0
 #define Press 1
@@ -65,6 +49,10 @@ Adafruit_ST7735 tft = Adafruit_ST7735(cs, dc, rst);
 #define BLEU ST7735_BLUE 
 #define VERT ST7735_GREEN 
 #define BLANC ST7735_WHITE 
+
+Adafruit_Keypad customKeypad = Adafruit_Keypad( makeKeymap(keys), rowPins, colPins, ROWS, COLS);
+
+
 
 
 
@@ -85,69 +73,47 @@ float savedVal[5];
 bool pointused[5] = {false};
 char* text;
 
-int MusiquePin = 44;
+int MusiquePin = 10;
 
 
-void setup(void) {
-   pinMode(button_mooveRight, INPUT);
-   pinMode(button_mooveLeft, INPUT);
-   pinMode(button_save1, INPUT);
-   pinMode(button_save2, INPUT);
-   pinMode(button_save3, INPUT);
-   pinMode(button_mesure_lancement, INPUT);
-   pinMode(button_mesure_pt_suivant, INPUT);
+
+
+
+void setup() {
+  Serial.begin(9600);
+  customKeypad.begin();   
+  
+  pinMode(button_mooveRight, INPUT);
+  pinMode(button_mooveLeft, INPUT);
+  pinMode(button_save1, INPUT);
+  pinMode(button_save2, INPUT);
+  pinMode(button_save3, INPUT);
+  pinMode(button_mesure_lancement, INPUT);
+  pinMode(button_mesure_pt_suivant, INPUT);
    
   tft.initR(INITR_BLACKTAB);
 
   initialaff();
-
 }
+/*
+  customKeypad.tick();
 
+  while(customKeypad.available()){
+    keypadEvent e = customKeypad.read();
+    Serial.print((char)e.bit.KEY);
+    if(e.bit.EVENT == KEY_JUST_PRESSED) Serial.println(" pressed");
+    else if(e.bit.EVENT == KEY_JUST_RELEASED) Serial.println(" released");
+  }
+
+  delay(10);
+*/
 void loop() {
 
-
-  
-  // boutons de déplacement du chariot
-  buttonState = digitalRead(button_mooveRight);
-  if (buttonState == HIGH) {
-    hideCurrentPos();
-    pos = pos -0.01;
-    affCurrentPos();
-  } 
-
-  buttonState = digitalRead(button_mooveLeft);
-  if (buttonState == HIGH) {
-    hideCurrentPos();
-    pos = pos + 0.01;
-    affCurrentPos();
-  } 
-  
-  // boutons de choix de positions
-  buttonState = digitalRead(button_save1);
-  if (buttonState == HIGH) {
-    positionchoosed(0);
-  } 
-
-  buttonState = digitalRead(button_save2);
-  if (buttonState == HIGH) {
-    positionchoosed(1);
-  } 
-
-  buttonState = digitalRead(button_save3);
-  if (buttonState == HIGH) {
-    positionchoosed(2);
-  } 
-
-  buttonState = digitalRead(button_mesure_lancement);
-  if (buttonState == HIGH) {
-    throwMesure();
-  } 
-
-  
-
-
-delay (200);
 }
+
+
+
+
 
 void throwMesure()
 {
