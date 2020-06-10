@@ -134,6 +134,14 @@ void loop() {
     pos = pos + 0.01;
     affCurrentPos();
   }
+  
+  float joystickValue = analogRead(A0);
+  if (joystickValue < 340 || joystickValue > 350)
+  {
+    hideCurrentPos();
+    pos = pos +  (joystickValue - 345) / 200;
+    affCurrentPos();
+  }
 
 
 
