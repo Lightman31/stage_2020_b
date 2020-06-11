@@ -8,6 +8,9 @@ https://www.raspberrypi.org/forums/viewtopic.php?t=195395
 
 https://forum.raspberry-pi.fr/t/executer-un-programme-au-demarrage-du-raspberry/5065/16
 
+https://forum.jeedom.com/viewtopic.php?t=31252
+
+
 
 
 
