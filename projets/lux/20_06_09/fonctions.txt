@@ -1,0 +1,43 @@
+
+
+void initialisationazero()
+{
+  while (val >= 0)
+  {
+    Serial.println(val);
+    val = val - 0.05;
+    delay(1);
+  }
+  Serial.println(val);
+  delay (1500);
+  
+  val = 2;
+  Serial.println(val);
+  
+  while (val >= 0)
+  {
+    Serial.println(val);
+    val = val - 0.01;
+    delay(20);
+  }
+  Serial.println(val);
+  delay (1500);
+  
+}
+
+void affValue_before()
+{
+  tft.setTextWrap(true);
+  tft.setCursor(0, 0);
+  tft.setTextColor(NOIR);
+  tft.setTextSize(2);
+  tft.print(val);
+}
+void affValue_after()
+{
+  tft.setTextWrap(true);
+  tft.setCursor(0, 0);
+  tft.setTextColor(BLANC);
+  tft.setTextSize(2);
+  tft.print(val);
+}
