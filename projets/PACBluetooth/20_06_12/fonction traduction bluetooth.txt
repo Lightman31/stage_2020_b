@@ -1,0 +1,20 @@
+Function trad_PAC_bluetooth(Totrad) 
+
+
+Totrad = Replace(Totrad, "&", "1") 'remplace le caractère & par 1'
+Totrad = Replace(Totrad, "é", "2")
+Totrad = Replace(Totrad, Chr(34), "3")
+Totrad = Replace(Totrad, "'", "4")
+Totrad = Replace(Totrad, "(", "5")
+Totrad = Replace(Totrad, "-", "6")
+Totrad = Replace(Totrad, "è", "7")
+Totrad = Replace(Totrad, "_", "8")
+Totrad = Replace(Totrad, "ç", "9")
+Totrad = Replace(Totrad, "à", "0")
+Totrad = Replace(Totrad, ":", ",")
+
+
+trad_PAC_bluetooth = Totrad
+
+
+End Function
