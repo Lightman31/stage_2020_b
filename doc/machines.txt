@@ -1,0 +1,3 @@
+tour : pour faire les entretoises des roues du chariot
+fraiseuse : pour construire et usiner le chariot 
+machine de traction : utilisé pour tester la résistance de la pièce imprimé
