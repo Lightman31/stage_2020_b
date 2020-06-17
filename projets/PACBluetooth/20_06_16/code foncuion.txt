@@ -1,4 +1,4 @@
-Function trad_PAC_bluetooth(Totrad)  
+﻿Function trad_PAC_bluetooth(Totrad)  
  
  
 Totrad = Replace(Totrad, "&", "1") 'remplace le caractère & par 1' 
@@ -19,3 +19,58 @@ trad_PAC_bluetooth = Totrad
  
  
 End Function
+
+-- Bouton 1 -> macro sur Touche
+
+
+Sub Touche()
+    Application.OnKey Chr(13), "raccourci"
+
+End Sub
+
+
+Sub raccourci()
+  a = ActiveCell.Value
+  b = trad_PAC_bluetooth(a)
+  ActiveCell.Value = b
+  ActiveCell.Offset(1, 0).Select
+
+End Sub
+
+Function trad_PAC_bluetooth(Totrad)
+ 
+ 
+Totrad = Replace(Totrad, "&", "1") 'remplace le caractère & par 1'
+Totrad = Replace(Totrad, "é", "2")
+Totrad = Replace(Totrad, Chr(34), "3")
+Totrad = Replace(Totrad, "'", "4")
+Totrad = Replace(Totrad, "(", "5")
+Totrad = Replace(Totrad, "-", "6")
+Totrad = Replace(Totrad, "è", "7")
+Totrad = Replace(Totrad, "_", "8")
+Totrad = Replace(Totrad, "ç", "9")
+Totrad = Replace(Totrad, "à", "0")
+Totrad = Replace(Totrad, ":", ",")
+Totrad = Replace(Totrad, ")", "-")
+ 
+ 
+trad_PAC_bluetooth = Totrad
+ 
+ 
+End Function
+
+-- bouton 2 macro sur manip_colonnes
+
+Sub Manip_colonnes()
+
+    Application.OnKey Chr(13), "rien"
+    
+End Sub
+
+Sub rien()
+
+    ' ne fait rien pour stopper la macro en cours
+    ActiveCell.Offset(1, 0).Select
+    
+End Sub
+
