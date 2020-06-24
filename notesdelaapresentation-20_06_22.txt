@@ -1,0 +1,9 @@
+metrologie legale (pompe a essence par ex)
+metrologie industrielle (frequence d'etalonnage definie par l'industriel ) (fréquence en fonction de l'utilisation, du cas, et de la criticité) 
+syteme lmanagement qualité (ISO 9001 (Princide de base de l'ISO9001 : ce que je fais : je l'écris, ce que j'écris : je le fais, dans le labo, il y a un processus), frequence etallonnage...) tracabilité
+
+ici : tout les systèmes étalon ont ue petite étiquette bleu qui définit leurs fiche de vie. quand un client demande, l'entreprise doit expliquer l'étallonage.
+norme ISO : internationale :: pour avoir accès aux normes, il faut payer. Les normes sont revues tout les 6 ans. 
+les normes sont sur le site de l'AFNOR
+labo raccordé aux étalons internationaux ISO 17025 ; l'entreprise n'est pas cretifié cofrac, car c'est très cher. Peut etre qu'ils vont le faire dans le futur, juste pour pouvoir le dire. UN LABO N'EST PAS COFRAC, il est cofrac pour un type de mesure seulement. 
+stratégie : tenter de faire un petit bout du labo cofrac (CONFIDENTIEL)

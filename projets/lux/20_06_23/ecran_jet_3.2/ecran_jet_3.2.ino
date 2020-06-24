@@ -3,6 +3,11 @@
 #include <Adafruit_GFX.h>    // Core graphics library
 #include <Adafruit_ST7735.h> // Hardware-specific library
 #include <SPI.h>
+#include <Wire.h>
+
+
+#define SLAVE_ADDR 9
+
 
 #define KEYPAD_PID3844
 #define R1    42
@@ -52,16 +57,6 @@ Adafruit_ST7735 tft = Adafruit_ST7735(cs, dc, rst);
 
 Adafruit_Keypad customKeypad = Adafruit_Keypad( makeKeymap(keys), rowPins, colPins, ROWS, COLS);
 
-/////////////////////////////////////////////
-// MOTEUR
-/////////////////////////////////////////////
-// Connections to A4988
-const int dirPin = 2;  // Direction
-const int stepPin = 3; // Step
-
-// Motor steps per rotation
-const int STEPS_PER_REV = 400;
-
 
 /////////////////////////////////////////////
 // Boutons de contrôle 
@@ -70,8 +65,8 @@ const int button_mesure_lancement = 32;
 const int button_mesure_pt_suivant = 34;
 // variables will change:
 int buttonState = 0;         // variable for reading the pushbutton status
-float supossedpos = 0 ; // position voulue par l'homme
-float actualpos = 0 ; // position réelle du chariot
+int supossedpos = 0 ; // position voulue par l'homme
+int actualpos = 0 ; // position réelle du chariot
 
 float savedVal[NBPOINT];
 bool pointused[NBPOINT] = {false};
@@ -87,15 +82,12 @@ void setup() {
   
 
   customKeypad.begin();
-
-    // Setup the pins as Outputs
-  pinMode(stepPin,OUTPUT); 
-  pinMode(dirPin,OUTPUT);
-
+  Wire.begin();
 
   pinMode(button_mesure_lancement, INPUT);
   pinMode(button_mesure_pt_suivant, INPUT);
 
+  Serial.begin(9600);
   tft.initR(INITR_BLACKTAB);
 
   initialaff();
@@ -138,7 +130,7 @@ void loop() {
   if (joystickValue < 510 || joystickValue > 525)
   {
     hideCurrentPos();
-    supossedpos = supossedpos + ( (joystickValue - 516) / 200 ) * (float( analogRead(A2)/700)+0.01);
+    supossedpos = supossedpos + ( (joystickValue - 516) / 40 ) * (( analogRead(A2)/40)+1);
     affCurrentPos();
   }
 
@@ -148,8 +140,10 @@ void loop() {
   if (buttonState == HIGH) {
     throwMesure();
   }
+  int memory = actualpos;
+  moove_chariot();
 
-  delay (200);
+  delay(200);
 }
 
 
@@ -182,11 +176,11 @@ void gotopoint(int point)
 
     if (supossedpos > savedVal[point])
     {
-      vect = -0.01;
+      vect = -1;
     }
     else
     {
-      vect = -0.01;
+      vect = -1;
     }
     hideCurrentPos();
     supossedpos = savedVal[point];
@@ -211,17 +205,17 @@ void positionchoosed(int number)
 {
   tft.setTextColor(NOIR);
   tft.setTextSize(1);
-  tft.setCursor(20, 50 + 10 * number);
+  tft.setCursor(20, 70 + 10 * number);
   tft.print(savedVal[number]);
   savedVal[number] = supossedpos;
   pointused[number] = true;
   tft.setTextColor(VERT);
   tft.setTextWrap(true);
-  tft.setCursor(0, 50 + 10 * number);
+  tft.setCursor(0, 70 + 10 * number);
   tft.print(number + 1);
-  tft.setCursor(10, 50 + 10 * number);
+  tft.setCursor(10, 70 + 10 * number);
   tft.print(":");
-  tft.setCursor(20, 50 + 10 * number);
+  tft.setCursor(20, 70 + 10 * number);
   tft.print(savedVal[number]);
 }
 
@@ -238,7 +232,7 @@ void initialisationazero()
   while (supossedpos >= 0)
   {
     Serial.println(supossedpos);
-    supossedpos = supossedpos - 0.05;
+    supossedpos = supossedpos - 1;
     delay(1);
   }
   Serial.println(supossedpos);
@@ -250,7 +244,7 @@ void initialisationazero()
   while (supossedpos >= 0)
   {
     Serial.println(supossedpos);
-    supossedpos = supossedpos - 0.01;
+    supossedpos = supossedpos - 1;
     delay(20);
   }
   Serial.println(supossedpos);
@@ -265,12 +259,12 @@ void initialaff()
   tft.setCursor(0, 30);
   clearscreen();
   affCurrentPos();
-  testdrawtext("1", ROUGE, 0, 50, 1);
-  testdrawtext("2", ROUGE, 0, 60, 1);
-  testdrawtext("3", ROUGE, 0, 70, 1);
-  testdrawtext("4", ROUGE, 0, 80, 1);
-  testdrawtext("5", ROUGE, 0, 90, 1);
-  testdrawtext("6", ROUGE, 0, 100, 1);
+  testdrawtext("1", ROUGE, 0, 70, 1);
+  testdrawtext("2", ROUGE, 0, 80, 1);
+  testdrawtext("3", ROUGE, 0, 90, 1);
+  testdrawtext("4", ROUGE, 0, 100, 1);
+  testdrawtext("5", ROUGE, 0, 110, 1);
+  testdrawtext("6", ROUGE, 0, 120, 1);
 }
 
 
@@ -291,35 +285,41 @@ void affCurrentPos()
   tft.print(supossedpos);
 }
 
-
-/*
 void moove_chariot()
 {
-  int sens = actualpos - supossedpos;
-
-  int  letempsdepas = 1000;
-  if (sens >= 0){
-    digitalWrite(dirPin,HIGH); 
-    
-    digitalWrite(stepPin,HIGH); 
-    delayMicroseconds(letempsdepas); 
-    digitalWrite(stepPin,LOW); 
-    delayMicroseconds(letempsdepas);
-    suposedpos = suposedpos +1;
-  }
-  else {
-    digitalWrite(stepPin,LOW); 
-    digitalWrite(stepPin,HIGH); 
-    delayMicroseconds(letempsdepas); 
-    digitalWrite(stepPin,LOW); 
-  delayMicroseconds(letempsdepas); 
-  suposedpos = suposedpos -1;
-  }
-
-
-
+  char tosend[5];
+  int val = supossedpos;
+  tosend[0] = char(val%10);
+  val = val-val%10;
+  if (tosend[0] == 0) {tosend[0] = 'A';}
+  
+  tosend[1] = char((val%100)/ 10);
+  val = val-val%100;
+  if (tosend[1] == 0) {tosend[1] = 'A';}
+  
+  tosend[2] = char((val%1000)/ 100);
+  val = val-val%1000;
+  if (tosend[2] == 0) {tosend[2] = 'A';}
+  
+  tosend[3] = char((val%10000)/ 1000);
+  val = val-val%10000;
+  if (tosend[3] == 0) {tosend[3] = 'A';}
+  
+  tosend[4] = char((val%100000)/ 10000);
+  val = val-val%100000;
+  if (tosend[4] == 0) {tosend[4] = 'A';}
+  
+  Wire.beginTransmission(SLAVE_ADDR);
+  Wire.write(tosend);
+  Wire.endTransmission();
+  Serial.print("value : ");
+  Serial.println(supossedpos);
+  Serial.print("trame : ");
+  Serial.print(int(tosend[0]));
+  Serial.print(int(tosend[1]));
+  Serial.print(int(tosend[2]));
+  Serial.print(int(tosend[3]));
+  Serial.println(int(tosend[4]));
 
   
 }
-
-*/

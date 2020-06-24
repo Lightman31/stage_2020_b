@@ -1,0 +1,43 @@
+afnor.org : NF C42-710   Fevrier 1988 : Trop vieux
+
+article 5.2 : évaluation des Luxmètres
+
+	5.2.1 : Linéarité des luxmètres
+		5.2.1.1 : principe de base
+		5.2.1.2 : incertitude sur la linéarité
+
+	5.2.3 : Fatigue des luxmètres
+		5.2.3.1 : principe de base
+		5.2.3.2 : incertitude due à la fatigue
+
+	5.2.4 : Effet de mémoire du luxmètre
+		5.2.4.1 : principe de base
+		5.2.4.2 : incertitude de mémoire
+
+	5.2.5 : effet de la température sur le luxmètre
+		5.2.5.1 : principe de base
+		5.2.5.2 : Coefficient de température
+
+	5.2.6 : Effet de la lumière modulée
+		5.2.6.1 : Fréquences limites
+		5.2.6.2 : Présentation de l'incertitude due à la lumière modulée sinusoïdalement
+		5.2.6.3 : Facteur de crête admissible
+		5.2.6.4 : Présentation des résultats relatifs au facteur de crête admissible
+	5.2.7 : Incertitude due au changement de calibre
+		5.2.7.1 :  principe de base
+
+
+
+
+
+
+wwww.afnor.org : ISO/CIE 19476:2014   Juin 2014
+
+
+
+
+
+
+
+
+
