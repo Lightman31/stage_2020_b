@@ -96,6 +96,41 @@ void setup() {
 }
 
 void loop() {
+  
+
+  gestion_boutons();
+  gestion_choix_positionnement();
+  gestion_clavier();
+
+
+
+  delay(200);
+}
+
+
+void gestion_boutons()
+{
+  buttonState = digitalRead(button_mesure_lancement);
+  if (buttonState == HIGH) {
+    throwMesure();
+  }
+}
+
+void gestion_choix_positionnement()
+{
+    float joystickValue = analogRead(A0) ;
+  if (joystickValue < 510 || joystickValue > 525)
+  {
+    hideCurrentPos();
+    supossedpos = supossedpos + ( (joystickValue - 516) / 40 ) * (( analogRead(A2)/40)+1);
+    affCurrentPos();
+  }
+}
+
+
+void gestion_clavier()
+{
+  
   customKeypad.tick();
   while (customKeypad.available()) {
     keypadEvent e = customKeypad.read();
@@ -127,28 +162,7 @@ void loop() {
     }
   }
 
-  
-  float joystickValue = analogRead(A0) ;
-  if (joystickValue < 510 || joystickValue > 525)
-  {
-    hideCurrentPos();
-    supossedpos = supossedpos + ( (joystickValue - 516) / 40 ) * (( analogRead(A2)/40)+1);
-    affCurrentPos();
-  }
-
-
-
-  buttonState = digitalRead(button_mesure_lancement);
-  if (buttonState == HIGH) {
-    throwMesure();
-  }
-  int memory = actualpos;
-
-  delay(200);
 }
-
-
-
 
 
 void throwMesure()
