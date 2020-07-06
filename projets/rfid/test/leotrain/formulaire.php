@@ -27,14 +27,26 @@
 				UID carte
 				<input type="text" placeholder="UID : xxx-xxx-xxx-xxx-xxx" name="UID">
 				Emplacement
-				<select name="statut12" >
+				<select name="statut21" >
 		    		<option value="">statut</option>
 		    		<option value="labo">labo</option>
 		    		<option value="atelier">atelier</option>
-		    		<option value="etallonage OK">etallonage OK</option>
-		    		<option value="logitique">logistique</option>
+		    		<option value="gravure">gravure</option>
+		    		<option value="logistique">logistique</option>
 				</select>
 				<input type="submit" value="Créer SAV">
+			</p>
+		</form>
+
+		<!-- Mise à jour UID  -->
+
+		<form action="MAJ_UID.php" method="post">
+			<p>
+				<label for="pseudo">Mise à jour UID</label>
+				<input type="text" placeholder="Num SAV" name="num_sav5">
+				Nouvel UID carte
+				<input type="text" placeholder="UID : xxx-xxx-xxx-xxx-xxx" name="UID">
+				<input type="submit" value="MAJ">
 			</p>
 		</form>
 
@@ -74,5 +86,25 @@
 			<input type="submit"  value="MAJ" />
 			</p>
 		</form>
+
+		<!-- Edit Note -->
+		<form action="MAJ_note.php" method="post">
+			<p>
+				<label for="pseudo">Mise à jour note </label>
+				<input type="text" placeholder="Num SAV" name="num_sav6">
+				Commentaire à ajouter
+				<input type="text" placeholder="texte" name="commentaire">
+				<input type="submit" value="MAJ">
+			</p>
+		</form>
+
+		<!-- tri par deadline -->
+		<p>
+		<form action="tri.php" method="post">
+			<p>
+			<button  type="submit">test</button>
+			</p>
+		</form>
+		</p>
     </body>
 </html>

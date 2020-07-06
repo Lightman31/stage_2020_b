@@ -2,12 +2,21 @@
 	requete :<br/> 
 	<?php 
 	// MAJ du sav a modifier
-		echo 'INSERT INTO SAV(num_sav,emplacement,UID) VALUES (';
-		echo $_POST['num_sav4'];
-		if ($_POST['statut12'] == "") {echo ",logistique";}
-		else {echo ',',$_POST['statut12'];}
-		echo ',',$_POST['UID'];
-		echo ');';
+		$bdd = new PDO ('mysql:host=localhost;dbname=blet;charset=utf8','root','root');
+		if ($_POST['statut21'] == "")
+		{
+			$req = $bdd->prepare('INSERT INTO SAV(num_sav,emplacement,UID) VALUES ( ?,logistique,?);'); 
+			$req->execute(array($_POST['num_sav4'],$_POST['UID'])) ;
+		}
+		else
+		{
+			$req = $bdd->prepare('INSERT INTO SAV(num_sav,emplacement,UID) VALUES ( ?,?,?);'); 
+			$req->execute(array($_POST['num_sav4'],$_POST['statut21'],$_POST['UID'])) ;
+		}
+		
+
+		$donnees = $req->fetch();	
+		echo $donnees['num_sav'];
 	?>
 </p>
 
