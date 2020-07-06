@@ -5,18 +5,19 @@
 	requete :<br/> 
 	<?php 
 	// MAJ du sav a modifier
-		echo 'UPDATE SAV SET emplacement =';
+		echo 'UPDATE SAV SET emplacement ="';
 		echo $_POST['emplacement'];
-		echo ' WHERE num_sav ="';
+		echo '" WHERE num_sav ="';
 		echo $_POST['num_sav2'];
 		echo '";';
+
 
 	// creation du nouveau statut
 		echo '<br/>';
 
-		echo 'INSERT INTO Statut(sav,inf_dat,nom_statut) VALUES("';
+		echo 'INSERT INTO Statut(sav,inf_dat,nom_statut) VALUES( (SELECT id_sav FROM `SAV` where num_sav = "';
 		echo $_POST['num_sav2'];
-		echo '",NOW(),"';
+		echo '"),NOW(),"';
 		if ($_POST['statut12'] == "" && $_POST['statut11'] == "") // dans le cas ou l'utilisatuer ne saisit pas de nouveau statut, on écrit l'emplacement
 		{
 			echo $_POST['emplacement'];
