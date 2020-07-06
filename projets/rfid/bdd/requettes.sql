@@ -9,7 +9,7 @@ CREATE TABLE Societe(id_societe INT PRIMARY KEY NOT NULL AUTO_INCREMENT, nom_soc
 CREATE TABLE Client(id_client INT PRIMARY KEY NOT NULL AUTO_INCREMENT, nom_client varchar(50), contact varchar(100), societe int , FOREIGN KEY(societe) REFERENCES Societe(id_societe));
 
 
-CREATE TABLE SAV(id_sav INT PRIMARY KEY NOT NULL AUTO_INCREMENT, nom_sav varchar(50), num_sav varchar(10) NOT NULL, UID bigint, note text, emplacement varchar(30), client int,  FOREIGN KEY(client) REFERENCES Client(id_client));
+CREATE TABLE SAV(id_sav INT PRIMARY KEY NOT NULL AUTO_INCREMENT, nom_sav varchar(50), num_sav varchar(10) NOT NULL, UID bigint, note text, emplacement varchar(30), client int,  FOREIGN KEY(client) REFERENCES Client(id_client), deadline DATE);
 
 
 CREATE TABLE Statut(id_statut INT PRIMARY KEY NOT NULL AUTO_INCREMENT, nom_statut varchar(50) NOT NULL, inf_dat DATETIME, sav int,  FOREIGN KEY(sav) REFERENCES SAV(id_sav));
