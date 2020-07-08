@@ -1,0 +1,10 @@
+
+to stop apache : sudo systemctl stop apache2
+
+to stop MySQL : sudo systemctl stop mysql
+
+to stop XAMPP : sudo /opt/lampp/lampp stop
+to start XAMPP : sudo /opt/lampp/lampp start
+
+
+
