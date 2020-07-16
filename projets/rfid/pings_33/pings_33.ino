@@ -1,3 +1,5 @@
+#include <LiquidCrystal.h>
+
 // Ping a remote server, also uses DHCP and DNS.
 // 2011-06-12 <jc@wippler.nl>
 //
@@ -6,7 +8,7 @@
 #include <EtherCard.h>
 
 // ethernet interface mac address, must be unique on the LAN
-static byte mymac[] = { 0x74,0x69,0x69,0x2D,0x30,0x33 };
+static byte mymac[] = { 0x74,0x69,0x69,0x2D,0x30,0x32 };
 
 byte Ethernet::buffer[700];
 static uint32_t timer;
@@ -34,7 +36,7 @@ void setup () {
   if (!ether.dnsLookup(PSTR("www.google.com")))
     Serial.println("DNS failed");
 #else
-  ether.parseIp(ether.hisip, "192.168.0.132");
+  ether.parseIp(ether.hisip, "192.168.0.133");
 #endif
   ether.printIp("SRV: ", ether.hisip);
 
