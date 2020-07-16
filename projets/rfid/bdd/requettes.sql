@@ -4,7 +4,7 @@ DROP DATABASE IF EXISTS blet;
 CREATE DATABASE blet DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 
 
-CREATE TABLE SAV(id_sav INT PRIMARY KEY NOT NULL AUTO_INCREMENT, echeance DATE, nom_sav varchar(50), num_sav varchar(10) NOT NULL, UID bigint);
+CREATE TABLE SAV(id_sav INT PRIMARY KEY NOT NULL AUTO_INCREMENT, echeance DATE, nom_sav varchar(50), num_sav varchar(12) NOT NULL, UID bigint);
 
 
 
