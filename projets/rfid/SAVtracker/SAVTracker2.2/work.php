@@ -7,19 +7,14 @@
         <title>SAV blet </title>
         <meta charset="utf-8" />
     </head>
-
-    	<?php 
-                include ("back/connect.php");
-
-    $bdd = connectBDD();
-        include ("front/menu.php"); ?>
+    	<?php include ("front/menu.php"); ?>
     <body onload="document.getElementById('num_sav1').focus()">
 
 
 
     </body>
-    <?php include ("front/overview.php"); 
-    echo '<meta http-equiv="refresh" content="5"> ';
+    <?php include ("front/to_work.php"); 
+    echo '<meta http-equiv="refresh" content="100"> ';
     ?>
 </html>
 
