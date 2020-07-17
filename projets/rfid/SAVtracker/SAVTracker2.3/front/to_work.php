@@ -44,7 +44,17 @@
 					// echo $line_query_statut['inf_dat_statut']. '</td><td>';
 					echo $line_query_emplacement['nom_emplacement'].'</td><td>';
 					// echo $line_query_emplacement['inf_dat_emplacement'].'</td><td>';
-					echo $donnees['echeance']  ;
+					if ($donnees['echeance'] <= date('Y-m-d'))
+					{
+						echo '<FONT color="red">';
+						echo $donnees['echeance']  ;
+						echo '</FONT>';
+
+					}
+					else 
+					{
+						echo $donnees['echeance'];
+					}					
 					echo '</td></tr>';
 
 				}
