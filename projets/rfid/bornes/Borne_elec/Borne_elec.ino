@@ -1,22 +1,30 @@
-#include "EtherCard.h"
+  #include "EtherCard.h"
 #include <SPI.h>
 #include <RFID.h>
 
 // ethernet interface mac address, must be unique on the LAN
 static byte mymac[] = { 0x74,0x69,0x69,0x2D,0x30,0x32 };
-const char website[] PROGMEM = "192.168.0.131";
+const char website[] PROGMEM = "192.168.0.106";
 byte Ethernet::buffer[700];
 static uint32_t timer;
 int state;
 #define TIMEOUT_MS 5000
+#define TIMEOUT_CARD 30000
 
 //Déclaration Module RFID sur les pins 10 & 9
 RFID monModuleRFID(10,9);
 int UID[5];
-char UID_carte[27] = {0};
+int taille;
+unsigned long previousMillis = 0;
+String UID_carte_op = "999999999999999";
+char UID_carte[35] = {0};
 String UID_carte_s;
+String UID_carte_buff;
 bool comp = true;
-bool scan = true;
+bool carte = false;
+bool envoi = false;
+bool scan = false;
+bool op = false;
 
 int noteDurations[] = {
   8, 8
@@ -25,31 +33,34 @@ int melody[] = {
   450, 550
 };
 
-
+int LED_OP = 6;
+int LED_SERV = 4;
 
 void setup () 
 {
-  pinMode(4,OUTPUT);
-  //Serial.begin(115200);
+  pinMode(LED_SERV,OUTPUT);
+  pinMode(5,INPUT);
+  pinMode(LED_OP,OUTPUT);
+  Serial.begin(115200);
   SPI.begin();
   monModuleRFID.init(); 
-  //Serial.println("\n[Multiple browseUrl request example");
+  Serial.println("\n[Multiple browseUrl request example");
 
   if (ether.begin(sizeof Ethernet::buffer, mymac, 8) == 0) 
   {
-    //Serial.println( "Error:Ethercard.begin");
+    Serial.println( "Error:Ethercard.begin");
     while(true);
   }
 
   if (!ether.dhcpSetup())
   {
-    //Serial.println("DHCP failed");
+    Serial.println("DHCP failed");
     while(true);
   }
   
-  //ether.printIp("IP:  ", ether.myip);
-  //ether.printIp("GW:  ", ether.gwip);  
-  //ether.printIp("DNS: ", ether.dnsip); 
+  ether.printIp("IP:  ", ether.myip);
+  ether.printIp("GW:  ", ether.gwip);  
+  ether.printIp("DNS: ", ether.dnsip); 
   
 #if 0
   // Wait for link to become up - this speeds up the dnsLoopup in the current version of the Ethercard library
@@ -66,16 +77,32 @@ long t=millis();
   }
   son();
   state=0;
-  //Serial.println("Start");
+  Serial.println("Start");
+  digitalWrite(LED_OP,HIGH);
 }
 
 void loop () 
 {
+  unsigned long currentMillis = millis();
+  if (currentMillis - previousMillis >= TIMEOUT_CARD) 
+  {
+    UID_carte_op="999999999999999";
+    Serial.println("carte reset");
+    previousMillis=currentMillis;
+    digitalWrite(LED_OP,HIGH);
+  }
+  if(digitalRead(5)){
+    digitalWrite(LED_OP,LOW);
+    Serial.println("bouton");
+    previousMillis=currentMillis;    
+  }
+  
   //RFID
     if (monModuleRFID.isCard()) 
-    {  
+    {    
       if (monModuleRFID.readCardSerial()) //Si on detecte une carte RFID
       { 
+        scan = true;
         for(int i=0;i<=4;i++) 
         {
           if (UID[i] != monModuleRFID.serNum[i]) //On compare les UID pour ne pas scanner 2x la même carte
@@ -86,11 +113,16 @@ void loop ()
       }
       monModuleRFID.halt();
     }
-    if (comp == false) //Si cartes différentes
+    if ((scan == true) && (carte == false)) //Si cartes différentes
     { 
-      if (scan == true) 
+      scan = false;
+      Serial.println(comp);
+      if (comp == false) 
       {
-      UID_carte_s="";
+        comp=true;
+        UID_carte_s="";
+        UID_carte_buff="";
+        taille=0;
         for(int i=0;i<=4;i++)
         {
           UID[i]=monModuleRFID.serNum[i]; //On récupère l'UID 
@@ -101,35 +133,68 @@ void loop ()
           {
             if (UID[k]<10) 
             {
-              UID_carte_s.concat("0");
+              UID_carte_buff.concat("0");
             }
-            UID_carte_s.concat("0");
+            UID_carte_buff.concat("0");
           }
-          UID_carte_s.concat((String)UID[k]);
-        }    
-        scan = false;
-        for (int j=0;j<15;j++)
+          UID_carte_buff.concat((String)UID[k]);
+        }  
+        if (digitalRead(5) && op == false)
         {
-          UID_carte[j]=UID_carte_s[j];
+          UID_carte_op=UID_carte_buff;
+          son();
+          op = true;
+          Serial.println(UID_carte_op);
+          digitalWrite(LED_OP,HIGH);
+          previousMillis=currentMillis;
         }
-        //Serial.println(UID_carte);
-        digitalWrite(4,HIGH); 
-      }    
-        
-        byte len;
-        //ether.packetLoop(ether.packetReceive());
-        switch (state)
+        else
         {
-          case 0:
-          if (millis() > timer) 
+            UID_carte_s=UID_carte_buff;
+            carte = true; 
+            son();
+        }
+        if (carte == true)
+        {
+          for (int j=0;j<15;j++)
           {
-          timer = millis() + 150;// every 30 secs
-          state=1;
+            UID_carte[j]=UID_carte_s[j];
           }
+          UID_carte_buff="&O=";
+          taille=taille+UID_carte_s.length();
+          for(int j=0;j<UID_carte_buff.length();j++) 
+          {
+            UID_carte[j+taille]=UID_carte_buff[j];
+          }
+          taille=taille+UID_carte_buff.length();
+          for(int j=0;j<UID_carte_op.length();j++) 
+          {
+            UID_carte[j+taille]=UID_carte_op[j];
+          }
+          envoi = true;
+          Serial.println(UID_carte);
+        }
+      }    
+    }
+        if (envoi == true)
+        {
+          digitalWrite(LED_SERV,HIGH);
+          byte len;
+          //ether.packetLoop(ether.packetReceive());
+          //Serial.println(state);
+          switch (state)
+          {
+          case 0:
+          
+            if (millis() > timer) 
+            {
+              timer = millis() + 150;// every 30 secs
+              state=1;
+            }
           break;
            case 1:
             while(ether.packetLoop(ether.packetReceive()));            
-            ether.browseUrl(PSTR("http://192.168.0.131/test/SAVTracker/arduino/update_SAV_zone_E.php?UID="),UID_carte, website, browseUrlCallback1);
+            ether.browseUrl(PSTR("http://192.168.0.106/SAVTracker2.4/arduino/update_SAV_zone_E.php?UID="),UID_carte, website, browseUrlCallback1);
             state=2;// Go to state to wait for response from browseURL
             timer = millis() + TIMEOUT_MS;// 5 second timeout
             break;
@@ -138,7 +203,7 @@ void loop ()
              {
               // timeout waiting for response
               state=1;
-              //Serial.println("TIMOEOUT");
+              Serial.println("TIMEOUT");
              }
              // waiting for response from previois calback
              ether.packetLoop(ether.packetReceive());
@@ -146,10 +211,14 @@ void loop ()
             break;
              case 5:
               son();
-              digitalWrite(4,LOW);
+              digitalWrite(LED_SERV,LOW);
               delay(500);
+              envoi = false;
               comp = true;
-              scan = true;
+              carte = false;
+              scan = false;
+              op = false;
+              Serial.println("envoi serveur");
               // waiting for response from previois calback
               while( ether.packetLoop(ether.packetReceive()));
               state=0;
@@ -159,6 +228,8 @@ void loop ()
         }
     }
 }
+ 
+
 
 // Called for each packet of returned data from the call to browseUrl (as persistent mode is set just before the call to browseUrl)
 static void browseUrlCallback1 (byte status, word off, word len) 
@@ -166,7 +237,7 @@ static void browseUrlCallback1 (byte status, word off, word len)
    Ethernet::buffer[off+len] = 0;// set the byte after the end of the buffer to zero to act as an end marker (also handy for displaying the buffer as a string)
    
    //Serial.println("Callback 1");
-   //Serial.println((char *)(Ethernet::buffer+off));
+   Serial.println((char *)(Ethernet::buffer+off));
    state=5;// Move to state that causes next browseUrl
 }
 
